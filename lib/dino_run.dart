@@ -2,17 +2,16 @@ import 'dart:async';
 
 import 'package:dino_run/components/player.dart';
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/parallax.dart';
 import 'package:flutter/material.dart';
 
-class DinoRun extends FlameGame {
+class DinoRun extends FlameGame with TapDetector {
   late final Player player;
   @override
   FutureOr<void> onLoad() async {
     await images.loadAllImages();
-    player = Player(size: Vector2.all(64), position: Vector2(100, 200))..priority=10;
-    add(player);
 
     final parallax = await loadParallaxComponent(
       [
@@ -28,6 +27,16 @@ class DinoRun extends FlameGame {
       velocityMultiplierDelta: Vector2(2, 0),
     );
     add(parallax);
+
+    player = Player();
+    add(player);
+
     return super.onLoad();
+  }
+
+  @override
+  void onTapDown(TapDownInfo info) {
+    player.hasJumped = true;
+    super.onTapDown(info);
   }
 }
