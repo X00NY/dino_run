@@ -21,5 +21,8 @@ flutter:
 
   assets:
     - assets/images/Main Characters/Ninja Frog/
+    - assets/images/Enemies/Bat/
+    - assets/images/Enemies/Chicken/
+    - assets/images/Enemies/Rino/
     - assets/images/Backgrounds/
     - assets/audio/

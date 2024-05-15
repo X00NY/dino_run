@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dino_run/components/enemy.dart';
 import 'package:dino_run/components/player.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -22,7 +23,7 @@ class DinoRun extends FlameGame with TapDetector {
         ParallaxImageData('Backgrounds/plx-5.png'),
         ParallaxImageData('Backgrounds/plx-6.png'),
       ],
-      baseVelocity: Vector2(3, 0),
+      baseVelocity: Vector2(5, 0),
       repeat: ImageRepeat.repeat,
       velocityMultiplierDelta: Vector2(2, 0),
     );
@@ -31,12 +32,15 @@ class DinoRun extends FlameGame with TapDetector {
     player = Player();
     add(player);
 
+    var enemy = Enemy(EnemyType.rino);
+    add(enemy);
+
     return super.onLoad();
   }
 
   @override
   void onTapDown(TapDownInfo info) {
-    player.hasJumped = true;
+    player.jump();
     super.onTapDown(info);
   }
 }

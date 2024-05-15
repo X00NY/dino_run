@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dino_run/constants/constants.dart';
 import 'package:dino_run/dino_run.dart';
 import 'package:flame/components.dart';
 
@@ -20,17 +21,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   late final SpriteAnimation jumpAnimation;
   late final SpriteAnimation fallAnimation;
 
-  double _speedY = 0.0;
-  //double _yMax = 0.0;
-
-  final double _gravity = 9.8;
-  final double _jumpForce = 260;
-  final double _terminalVelocity = 300;
-
-  bool isOnGround = false;
-  bool hasJumped = false;
-
-  final double stepTime = 0.05;
+  double _gravity = 0.0;
+  double _speedY = 0;
+  double _yMax = 0;
 
   @override
   FutureOr<void> onLoad() {
@@ -41,15 +34,24 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   }
 
   @override
-  void update(double dt) {
-    _updatePlayerMouvement(dt);
-    _updatePlayerState();
-    _applyGravity(dt);
+  void onGameResize(Vector2 size) {
+    var groundLvl = size.y * 0.88;
+    _gravity = size.y * 2.5;
+    height = width = size.y / 6;
+    position.x = 150;
+    position.y = groundLvl - height;
+    _yMax = position.y;
+    super.onGameResize(size);
+  }
 
+  @override
+  void update(double dt) {
+    _updateState();
+    _updatePos(dt);
     super.update(dt);
   }
 
-  void _updatePlayerState() {
+  void _updateState() {
     if (_speedY < 0) {
       current = PlayerState.jumping;
     } else if (_speedY > 0) {
@@ -59,27 +61,18 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     }
   }
 
-  void _updatePlayerMouvement(double dt) {
-    if (hasJumped && isOnGround) jump(dt);
-
-    if (_speedY> _gravity) isOnGround = false;
-  }
-
-  void _applyGravity(double dt) {
-    _speedY += _gravity;
-    _speedY = _speedY.clamp(-_jumpForce, _terminalVelocity);
+  void _updatePos(double dt) {
+    _speedY += _gravity * dt;
     position.y += _speedY * dt;
+    if (isOnGround()) {
+      position.y = _yMax;
+      _speedY = 0;
+    }
   }
 
-  @override
-  void onGameResize(Vector2 size) {
-    height = width = size.y / 8;
-    position.x = 150;
-    position.y = size.y - height * 2;
-    super.onGameResize(size);
-    //_yMax = position.y;
+  bool isOnGround() {
+    return (position.y >= _yMax);
   }
-
 
   SpriteAnimation _playerSpriteAnimation(String state, int amount) {
     return SpriteAnimation.fromFrameData(
@@ -103,10 +96,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     };
   }
 
-  void jump(double dt) {
-    _speedY = -_jumpForce;
-    position.y += _speedY * dt;
-    isOnGround = false;
-    hasJumped = false;
+  void jump() {
+    if (isOnGround()) _speedY = -(game.size.y * 1.5);
   }
 }
