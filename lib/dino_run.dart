@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dino_run/components/enemy.dart';
+import 'package:dino_run/components/enemy_manager.dart';
 import 'package:dino_run/components/player.dart';
 import 'package:dino_run/components/score.dart';
 import 'package:flame/components.dart';
@@ -11,7 +12,8 @@ import 'package:flutter/material.dart';
 
 class DinoRun extends FlameGame with TapDetector {
   late final Player player;
-  late final Score _scoreText;
+  late final EnemyManager enemyManager;
+
   int score = 0;
   @override
   FutureOr<void> onLoad() async {
@@ -35,9 +37,10 @@ class DinoRun extends FlameGame with TapDetector {
     player = Player();
     add(player);
 
-    var enemy = Enemy(EnemyType.rino);
-    add(enemy);
-    add(_scoreText);
+    enemyManager = EnemyManager();
+    add(enemyManager);
+
+    add(Score());
 
     return super.onLoad();
   }
@@ -50,8 +53,7 @@ class DinoRun extends FlameGame with TapDetector {
 
   @override
   void update(double dt) {
-    score += (1000 * dt).toInt();
-    _scoreText.text = score.toString();
+    score += (100 * dt).toInt();
     super.update(dt);
   }
 }

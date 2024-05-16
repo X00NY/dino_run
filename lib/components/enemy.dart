@@ -35,32 +35,29 @@ class Enemy extends SpriteAnimationComponent with HasGameRef {
 
   final Map<EnemyType, EnemyData> enemyDetails = {
     EnemyType.bat: EnemyData(
-      imageName: 'Enemies/Bat/Flying (46x30).png',
-      textureWidth: 46,
-      textureHeight: 30,
-      amount: 7,
-      speed: 400,
-      yPos: 150,
-      scaleSize: 8
-    ),
+        imageName: 'Enemies/Bat/Flying (46x30).png',
+        textureWidth: 46,
+        textureHeight: 30,
+        amount: 7,
+        speed: 400,
+        yPos: 150,
+        scaleSize: 8),
     EnemyType.chicken: EnemyData(
-      imageName: 'Enemies/Chicken/Run (32x34).png',
-      textureWidth: 32,
-      textureHeight: 34,
-      amount: 14,
-      speed: 500,
-      yPos: 0,
-      scaleSize: 6
-    ),
+        imageName: 'Enemies/Chicken/Run (32x34).png',
+        textureWidth: 32,
+        textureHeight: 34,
+        amount: 14,
+        speed: 500,
+        yPos: 0,
+        scaleSize: 6),
     EnemyType.rino: EnemyData(
-      imageName: 'Enemies/Rino/Run (52x34).png',
-      textureWidth: 52,
-      textureHeight: 34,
-      amount: 6,
-      speed: 600,
-      yPos: 0,
-      scaleSize: 6
-    ),
+        imageName: 'Enemies/Rino/Run (52x34).png',
+        textureWidth: 52,
+        textureHeight: 34,
+        amount: 6,
+        speed: 600,
+        yPos: 0,
+        scaleSize: 6),
   };
   Enemy(EnemyType enemytype) : super() {
     _enemyData = enemyDetails[enemytype]!;
@@ -68,6 +65,7 @@ class Enemy extends SpriteAnimationComponent with HasGameRef {
 
   @override
   FutureOr<void> onLoad() {
+    debugMode = true;
     _speed = _enemyData.speed;
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache(_enemyData.imageName),
@@ -106,7 +104,7 @@ class Enemy extends SpriteAnimationComponent with HasGameRef {
     super.update(dt);
 
     if (position.x < -width) {
-      position.x = game.size.x + width;
+      removeFromParent();
     }
   }
 }

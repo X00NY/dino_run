@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:dino_run/constants/constants.dart';
 import 'package:dino_run/dino_run.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/foundation.dart';
 
 enum PlayerState {
   idle,
@@ -15,21 +17,29 @@ enum PlayerState {
 }
 
 class Player extends SpriteAnimationGroupComponent<PlayerState>
-    with HasGameRef<DinoRun>, KeyboardHandler {
+    with HasGameRef<DinoRun>, KeyboardHandler, CollisionCallbacks {
   late final SpriteAnimation idleAnimation;
   late final SpriteAnimation runAnimation;
   late final SpriteAnimation jumpAnimation;
   late final SpriteAnimation fallAnimation;
+  Vector2 hitboxPos = Vector2.zero();
+  Vector2 hitboxSize = Vector2.zero();
 
   double _gravity = 0.0;
   double _speedY = 0;
   double _yMax = 0;
+  //final double _realWidthRatio = 20 / 32;
 
   @override
   FutureOr<void> onLoad() {
+    debugPrint(width.toString());
+    debugMode = true;
+
     _loadAllAnimations();
+    add(RectangleHitbox(position: hitboxPos, size: hitboxSize));
 
     current = PlayerState.running;
+
     return super.onLoad();
   }
 
@@ -41,6 +51,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     position.x = 150;
     position.y = groundLvl - height;
     _yMax = position.y;
+    hitboxPos =
+        Vector2(width - (width * (1 - 0.62)), height - (height * (1 - 0.75)));
+    hitboxSize = Vector2(width * 0.62, height * 0.75);
     super.onGameResize(size);
   }
 

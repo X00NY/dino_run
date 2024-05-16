@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:dino_run/dino_run.dart';
 import 'package:flame/components.dart';
 
@@ -8,10 +6,19 @@ class Score extends TextComponent with HasGameRef<DinoRun> {
   late String score;
 
   @override
-  FutureOr<void> onLoad() {
+  void update(double dt) {
     score = game.score.toString();
-    text = 'SCORE: $score';
-    position = Vector2(100, 20);
-    return super.onLoad();
+    text = score;
+    position = Vector2((game.size.x / 2) - width / 2, 20);
+    super.update(dt);
+  }
+
+  @override
+  void onGameResize(Vector2 size) {
+    
+    score = game.score.toString();
+    text = score;
+    position = Vector2((game.size.x / 2) - width / 2, 20);
+    super.onGameResize(size);
   }
 }
