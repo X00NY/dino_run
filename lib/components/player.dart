@@ -1,10 +1,14 @@
 import 'dart:async';
 
+import 'package:dino_run/components/custom_hitbox.dart';
+import 'package:dino_run/components/digi_life.dart';
+import 'package:dino_run/components/enemies/bat.dart';
+import 'package:dino_run/components/enemies/chicken.dart';
+import 'package:dino_run/components/enemies/rino.dart';
 import 'package:dino_run/constants/constants.dart';
 import 'package:dino_run/dino_run.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
 
 enum PlayerState {
   idle,
@@ -17,26 +21,39 @@ enum PlayerState {
 }
 
 class Player extends SpriteAnimationGroupComponent<PlayerState>
-    with HasGameRef<DinoRun>, KeyboardHandler, CollisionCallbacks {
+    with HasGameRef<DinoRun>, CollisionCallbacks {
+  Player({
+    required super.position,
+  }) : super(size: Vector2.all(96), anchor: Anchor.bottomCenter);
   late final SpriteAnimation idleAnimation;
   late final SpriteAnimation runAnimation;
   late final SpriteAnimation jumpAnimation;
   late final SpriteAnimation fallAnimation;
-  Vector2 hitboxPos = Vector2.zero();
-  Vector2 hitboxSize = Vector2.zero();
+  late final SpriteAnimation hitAnimation;
 
-  double _gravity = 0.0;
+  final double _jumpForce = 1000;
+  final double _gravity = 15;
   double _speedY = 0;
   double _yMax = 0;
-  //final double _realWidthRatio = 20 / 32;
+  bool _gothit = false;
+
+  CustomHitbox hitbox = CustomHitbox(
+    offsetX: 20,
+    offsetY: 20,
+    width: 60,
+    height: 70,
+  );
 
   @override
   FutureOr<void> onLoad() {
-    debugPrint(width.toString());
-    debugMode = true;
+    //debugMode = true;
+    _yMax = game.size.y * 0.88;
 
     _loadAllAnimations();
-    add(RectangleHitbox(position: hitboxPos, size: hitboxSize));
+    add(RectangleHitbox(
+      position: Vector2(hitbox.offsetX, hitbox.offsetY),
+      size: Vector2(hitbox.width, hitbox.height),
+    ));
 
     current = PlayerState.running;
 
@@ -44,28 +61,36 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   }
 
   @override
-  void onGameResize(Vector2 size) {
-    var groundLvl = size.y * 0.88;
-    _gravity = size.y * 2.5;
-    height = width = size.y / 6;
-    position.x = 150;
-    position.y = groundLvl - height;
-    _yMax = position.y;
-    hitboxPos =
-        Vector2(width - (width * (1 - 0.62)), height - (height * (1 - 0.75)));
-    hitboxSize = Vector2(width * 0.62, height * 0.75);
-    super.onGameResize(size);
-  }
-
-  @override
   void update(double dt) {
     _updateState();
     _updatePos(dt);
+    if (game.health <= 0) {
+      removeFromParent();
+    }
     super.update(dt);
   }
 
-  void _updateState() {
-    if (_speedY < 0) {
+  @override
+  void onCollisionStart(
+      Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is DigiLife) {
+      other.removeFromParent();
+      if (game.health < 3) {
+        game.health++;
+      }
+    } else if (other is Rino || other is Chicken || other is Bat) {
+      _getHit();
+    }
+
+    super.onCollisionStart(intersectionPoints, other);
+  }
+
+  void _updateState() async {
+    if (_gothit) {
+      current = PlayerState.hit;
+      await animationTicker!.completed;
+      _gothit = false;
+    } else if (_speedY < 0) {
       current = PlayerState.jumping;
     } else if (_speedY > 0) {
       current = PlayerState.falling;
@@ -75,7 +100,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   }
 
   void _updatePos(double dt) {
-    _speedY += _gravity * dt;
+    _speedY += _gravity;
     position.y += _speedY * dt;
     if (isOnGround()) {
       position.y = _yMax;
@@ -100,16 +125,23 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     runAnimation = _playerSpriteAnimation('Run', 12);
     jumpAnimation = _playerSpriteAnimation('Jump', 1);
     fallAnimation = _playerSpriteAnimation('Fall', 1);
+    hitAnimation = _playerSpriteAnimation('Hit', 7)..loop = false;
 
     animations = {
       PlayerState.idle: idleAnimation,
       PlayerState.running: runAnimation,
       PlayerState.jumping: jumpAnimation,
       PlayerState.falling: fallAnimation,
+      PlayerState.hit: hitAnimation,
     };
   }
 
   void jump() {
-    if (isOnGround()) _speedY = -(game.size.y * 1.5);
+    if (isOnGround()) _speedY = -_jumpForce;
+  }
+
+  void _getHit() async {
+    _gothit = true;
+    game.health--;
   }
 }

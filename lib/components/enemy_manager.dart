@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:dino_run/components/enemy.dart';
+import 'package:dino_run/components/enemies/bat.dart';
+import 'package:dino_run/components/enemies/chicken.dart';
+import 'package:dino_run/components/enemies/rino.dart';
 import 'package:dino_run/dino_run.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
 
 class EnemyManager extends Component with HasGameRef<DinoRun> {
   late Random _random;
@@ -37,13 +38,25 @@ class EnemyManager extends Component with HasGameRef<DinoRun> {
       });
       _timer.start();
     }
+    if (game.health <= 0) {
+      removeFromParent();
+    }
     super.update(dt);
   }
 
   void _spawnRandomEnemy() {
-    final randomNbr = _random.nextInt(EnemyType.values.length);
-    final randomEnemyType = EnemyType.values.elementAt(randomNbr);
-    final newEnemy = Enemy(randomEnemyType);
-    game.add(newEnemy);
+    final randomNbr = _random.nextInt(3);
+    final enemyPos = Vector2(game.size.x, game.size.y * 0.88);
+    switch (randomNbr) {
+      case 0:
+        game.world.add(Bat(position: enemyPos));
+        break;
+      case 1:
+        game.world.add(Chicken(position: enemyPos));
+        break;
+      case 2:
+        game.world.add(Rino(position: enemyPos));
+        break;
+    }
   }
 }
