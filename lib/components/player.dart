@@ -31,8 +31,8 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   late final SpriteAnimation fallAnimation;
   late final SpriteAnimation hitAnimation;
 
-  final double _jumpForce = 1000;
-  final double _gravity = 15;
+  final double _jumpForce = 900;
+  final double _gravity = 1700;
   double _speedY = 0;
   double _yMax = 0;
   bool _gothit = false;
@@ -100,7 +100,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   }
 
   void _updatePos(double dt) {
-    _speedY += _gravity;
+    _speedY += _gravity * dt;
     position.y += _speedY * dt;
     if (isOnGround()) {
       position.y = _yMax;
