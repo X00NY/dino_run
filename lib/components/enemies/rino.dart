@@ -26,7 +26,7 @@ class Rino extends SpriteAnimationComponent with HasGameRef<DinoRun> {
       game.images.fromCache('Enemies/Rino/Run (52x34).png'),
       SpriteAnimationData.sequenced(
         amount: 6,
-        stepTime: stepTime,
+        stepTime: Constants.stepTime,
         textureSize: Vector2(52, 34),
       ),
     );

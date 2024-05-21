@@ -26,7 +26,7 @@ class Chicken extends SpriteAnimationComponent with HasGameRef<DinoRun> {
       game.images.fromCache('Enemies/Chicken/Run (32x34).png'),
       SpriteAnimationData.sequenced(
         amount: 14,
-        stepTime: stepTime,
+        stepTime: Constants.stepTime,
         textureSize: Vector2(32, 34),
       ),
     );

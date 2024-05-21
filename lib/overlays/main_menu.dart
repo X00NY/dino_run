@@ -1,15 +1,22 @@
+import 'package:dino_run/components/widget/card_character.dart';
+import 'package:dino_run/constants/constants.dart';
 import 'package:dino_run/dino_run.dart';
 import 'package:flutter/material.dart';
 
-class MainMenu extends StatelessWidget {
-  // Reference to parent game.
+class MainMenu extends StatefulWidget {
   final DinoRun game;
 
   const MainMenu({super.key, required this.game});
 
   @override
+  State<MainMenu> createState() => _MainMenuState();
+}
+
+class _MainMenuState extends State<MainMenu> {
+  late String? selectedCharacter;
+  @override
   Widget build(BuildContext context) {
-    game.pauseEngine();
+    widget.game.pauseEngine();
 
     const blackTextColor = Color.fromRGBO(0, 0, 0, 1.0);
     const whiteTextColor = Color.fromRGBO(255, 255, 255, 1.0);
@@ -19,11 +26,11 @@ class MainMenu extends StatelessWidget {
       child: Center(
         child: Container(
           padding: const EdgeInsets.all(10.0),
-          height: 250,
-          width: 300,
+          //height: 250,
+          //width: 300,
           decoration: const BoxDecoration(
             color: blackTextColor,
-            borderRadius: const BorderRadius.all(
+            borderRadius: BorderRadius.all(
               Radius.circular(20),
             ),
           ),
@@ -37,14 +44,33 @@ class MainMenu extends StatelessWidget {
                   fontSize: 24,
                 ),
               ),
+              SizedBox(
+                //width: 600,
+                height: 200,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  separatorBuilder: (context, index) {
+                    return const SizedBox(width: 10);
+                  },
+                  scrollDirection: Axis.horizontal,
+                  itemCount: Constants.characters.length,
+                  itemBuilder: (context, index) {
+                    final name = Constants.characters[index];
+                    return CardCharacter(
+                        name: name,
+                        bgColor: Colors.black,
+                        borderColor: Colors.white);
+                  },
+                ),
+              ),
               const SizedBox(height: 40),
               SizedBox(
                 width: 200,
                 height: 75,
                 child: ElevatedButton(
                   onPressed: () {
-                    game.resumeEngine();
-                    game.overlays.remove('MainMenu');
+                    widget.game.resumeEngine();
+                    widget.game.overlays.remove('MainMenu');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: whiteTextColor,

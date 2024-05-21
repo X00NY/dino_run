@@ -116,7 +116,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     return SpriteAnimation.fromFrameData(
       game.images.fromCache('Main Characters/Ninja Frog/$state (32x32).png'),
       SpriteAnimationData.sequenced(
-          amount: amount, stepTime: stepTime, textureSize: Vector2.all(32)),
+          amount: amount,
+          stepTime: Constants.stepTime,
+          textureSize: Vector2.all(32)),
     );
   }
 

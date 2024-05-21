@@ -27,7 +27,7 @@ class Bat extends SpriteAnimationComponent with HasGameRef<DinoRun> {
       game.images.fromCache('Enemies/Bat/Flying (46x30).png'),
       SpriteAnimationData.sequenced(
         amount: 6,
-        stepTime: stepTime,
+        stepTime: Constants.stepTime,
         textureSize: Vector2(46, 30),
       ),
     );
